@@ -1,0 +1,14 @@
+.screen {
+  display: flex;
+  text-align: end;
+  background-color: var(--screen-color);
+  color: #fff;
+  margin: 5rem auto 0 auto;
+  width: 300px;
+}
+
+.screen h1 {
+  padding: 1rem;
+  width: 100%;
+  padding-right: 1rem;
+}
