@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from "react";
+import { evaluate, format } from "mathjs";
 
 import "./interface.style.css";
 
+let oldBtnValue;
+let dot = false;
+let epsilon = 0.00000001;
+
 function getAns(firstValue, action, secondValue) {
-  const answer = eval(`${firstValue} ${action} ${secondValue}`);
+  let answer = evaluate(`${firstValue} ${action} ${secondValue}`);
+  answer = format(answer, { precision: 14 });
   return answer;
 }
 
@@ -21,11 +27,21 @@ function calc(
   const btnValue = e.target.value;
   // If user pressed number btn
   if (Number.isInteger(Number(btnValue)) && action === null) {
-    const newValue = screenValue * 10 + Number(btnValue);
+    let newValue;
+    if (screenValue === 0) {
+      newValue = String(btnValue);
+    } else {
+      newValue = screenValue + String(btnValue);
+    }
     setFirstValue(newValue);
     setScreenValue(newValue);
   } else if (Number.isInteger(Number(btnValue)) && action !== null) {
-    const newValue = secondValue * 10 + Number(btnValue);
+    let newValue;
+    if (screenValue === 0) {
+      newValue = String(btnValue);
+    } else {
+      newValue = screenValue + String(btnValue);
+    }
     setSecondValue(newValue);
     setScreenValue(newValue);
   }
@@ -33,8 +49,10 @@ function calc(
   else {
     switch (btnValue) {
       case "C":
+        dot = false;
         setScreenValue(0);
         setFirstValue(0);
+        setSecondValue(0);
         setAction(null);
         break;
       case "=":
@@ -56,8 +74,19 @@ function calc(
         setFirstValue(firstValue / 100);
         setAction("*");
         break;
+      case ".":
+        if (!dot) {
+          dot = true;
+          setScreenValue(screenValue + ".");
+        }
+        break;
       //If arithmetic action
       default:
+        if (oldBtnValue === "=") {
+          setAction(btnValue);
+          setSecondValue(0);
+          break;
+        }
         if (secondValue) {
           if (action === null) break;
           const answer = getAns(firstValue, action, secondValue);
@@ -67,11 +96,13 @@ function calc(
           setAction(btnValue);
           break;
         }
+        dot = false;
         setScreenValue(0);
         setAction(btnValue);
         break;
     }
   }
+  oldBtnValue = btnValue;
 }
 
 function Interface({ screenValue, setScreenValue }) {
